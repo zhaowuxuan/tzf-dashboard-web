@@ -31,6 +31,17 @@ export const constantRouterMap = [
       component: () => import('@/views/home/index'),
       meta: {title: '首页', icon: 'home'}
     }]
+  },
+  {
+    path: '',
+    component: Layout,
+    redirect: '/report_home',
+    children: [{
+      path: 'report_home',
+      name: 'report_home',
+      component: () => import('@/views/home/report_index'),
+      meta: {title: '报表首页', icon: 'report_home'}
+    }]
   }
 ]
 
@@ -355,6 +366,27 @@ export const asyncRouterMap = [
         component: () => import('@/views/ums/resource/categoryList'),
         meta: {title: '资源分类'},
         hidden: true
+      }
+    ]
+  },
+  {
+    path:'/report',
+    component: Layout,
+    redirect: '/report/share',
+    name: 'report',
+    meta: {title: '报表', icon: 'report'},
+    children: [
+      {
+        path: 'share',
+        name: 'share',
+        component: () => import('@/views/report/share/index'),
+        meta: {title: 'share', icon: 'report-share'}
+      },
+      {
+        path: 'shareholder',
+        name: 'shareholder',
+        component: () => import('@/views/report/shareholder/index'),
+        meta: {title: 'shareholder', icon: 'report-shareholder'}
       }
     ]
   },
