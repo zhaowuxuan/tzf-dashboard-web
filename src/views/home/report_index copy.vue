@@ -10,15 +10,22 @@
   </div>
 </template>
 <script>
-  import myjsondata from './data1.txt';
+  // import myjsondata from './data1.txt';
   // import {fetchList} from '@/api/productAttrCate';
-  import {getNewestdata,getStockdata} from '@/api/report';
+  import {
+    getNewestdata,
+    getStockdata
+  } from '@/api/report';
   export default {
     name: 'report_home',
     data() {
       return {
         allChart: {
-          allData: [],
+          allData: {
+            oi: [],
+            oi_ccy: [],
+            ts: []
+          },
           priceContainer: 0,
           bubbleContainer: 0,
           cumulativeContainer: 0,
@@ -27,29 +34,27 @@
       }
     },
     methods: {
-      async initData() {
-        // var tmp = JSON.parse(data).ts.map(Date);
-        // // alert(JSON.parse(data).ts.map(Date));
-        // // alert(type(JSON.parse(data)));
-        // this.allChart.allData = JSON.parse(data);
-        // this.allChart.allData.ts = tmp;
-        await getStockdata("open-interest", "PEOPLE-USDT-SWAP", "SWAP").then(response => {
-            this.allChart.allData = response.data;
-            // that.allChart.allData.oi.push(response.data.oi);
-            // that.allChart.allData.oi_ccy.push(response.data.oi_ccy);
-            // that.allChart.allData.ts.push(response.data.ts);
-            // var date = new Date(response.data.ts).toLocaleString();
-          });
-          // alert("initData "+this.allChart.allData.oi);
+      initData() {
+        getStockdata("open-interest", "PEOPLE-USDT-SWAP", "SWAP").then(response => {
+          this.allChart.allData.oi = response.data.oi;
+          this.allChart.allData.oi_ccy = response.data.oi_ccy;
+          this.allChart.allData.ts = response.data.ts;
+        });
       },
       initContainer() {
-        // alert("initContainer "+this.allChart.allData.oi);
         this.allChart.priceContainer = document.getElementById('pricechart-container');
+        getStockdata("open-interest", "PEOPLE-USDT-SWAP", "SWAP").then(response => {
+          this.allChart.allData.oi = response.data.oi;
+          this.allChart.allData.oi_ccy = response.data.oi_ccy;
+          this.allChart.allData.ts = response.data.ts;
+        });
       },
-      initMyChart(container, data, index) {
-        // alert(timeData);
+      initMyChart(container, oi, oi_ccy, ts) {
+        var that = this;
+        var timeData = this.allChart.allData.ts;
+        alert(0);
+        alert(timeData);
         var chart = echarts.init(container);
-        // alert(chart);
         var option = {
           axisPointer: {
             link: {
@@ -85,7 +90,7 @@
             axisLine: {
               onZero: true
             },
-            data: this.allChart.allData.ts //timeData
+            data: that.allChart.allData.ts //timeData
           }],
           yAxis: [{
               name: 'BTC Price (USD)',
@@ -101,22 +106,24 @@
               type: 'line',
               hoverAnimation: false,
               smooth: true,
-              data: this.allChart.allData.oi_ccy
+              data: that.allChart.allData.oi_ccy
             },
             {
               name: 'linear scale',
               type: 'line',
               smooth: true,
               hoverAnimation: false,
-              data: this.allChart.allData.oi
+              data: that.allChart.allData.oi
             }
           ]
         };
-        chart.setOption(option);
         chart.resize({
           height: 550,
           width: "auto"
         });
+        // alert(3);
+        // alert(this.allChart.allData.oi);
+
         function addData(that) {
           getNewestdata("open-interest", "PEOPLE-USDT-SWAP", "SWAP").then(response => {
             that.allChart.allData.oi.push(response.data.oi);
@@ -126,25 +133,22 @@
             // alert(date);
           })
         };
-        var that = this;
         setInterval(function () {
-          addData(that);
+          // addData(that);
+          alert(1);
+          alert(that.allChart.allData.oi);
           chart.setOption(option);
-        }, 5000);
+        }, 3000);
         window.addEventListener("resize", () => {
           chart.resize();
         });
-      },
-      async initAll(){
-        await this.initData();
-        await this.initContainer();
-        await this.initMyChart(this.allChart.priceContainer, this.allChart.allData.oi, 0);
       }
     },
     mounted() {
-      this.initAll();
-      // this.initContainer();
-      // this.initMyChart(this.allChart.priceContainer, this.allChart.allData.oi, 0);
+      this.initData();
+      this.initContainer();
+      this.initMyChart(this.allChart.priceContainer, this.allChart.allData.oi, this.allChart.allData.oi_ccy, this
+        .allChart.allData.ts);
     }
   }
 
